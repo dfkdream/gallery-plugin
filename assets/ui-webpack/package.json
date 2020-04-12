@@ -1,0 +1,27 @@
+{
+  "name": "ui-webpack",
+  "version": "1.0.0",
+  "description": "Web UI for gallery-plugin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "dfkdream",
+  "license": "MIT",
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.4.2",
+    "file-loader": "^6.0.0",
+    "html-loader": "^1.0.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "raw-loader": "^4.0.0",
+    "sass-loader": "^8.0.2",
+    "terser-webpack-plugin": "^2.3.5",
+    "url-loader": "^4.0.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}
