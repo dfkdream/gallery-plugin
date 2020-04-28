@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -22,7 +23,7 @@ func Get() *Config {
 }
 
 func (c Config) String() string {
-	return "BoltPath: " + c.BoltPath
+	return fmt.Sprintf("BoltPath: %s\nInterpolation: %d\nQuality: %d", c.BoltPath, c.Interpolation, c.Quality)
 }
 
 func getEnvStringOr(key string, defaultValue string) string {
@@ -52,7 +53,7 @@ func getEnvInterpolationOr(key string, defaultValue resize.InterpolationFunction
 }
 
 func getEnvIntOr(key string, defaultValue int) int {
-	if value, err := strconv.Atoi(os.Getenv(key)); err != nil {
+	if value, err := strconv.Atoi(os.Getenv(key)); err == nil {
 		return value
 	}
 	return defaultValue
