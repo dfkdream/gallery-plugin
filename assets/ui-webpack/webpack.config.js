@@ -13,7 +13,8 @@ module.exports = {
 		]
 	},
 	entry: {
-	    // TODO: Add Entrypoint files
+		admin: "./src/js/admin/App.js",
+        gallery: "./src/js/gallery/App.js"
 	},
 	output: {
 		filename: '[name].bundle.js',
@@ -21,6 +22,19 @@ module.exports = {
 	},
 	module: {
 		rules: [
+			{
+				test:/\.js$/,
+				exclude: /node_modules/,
+				use: {
+					loader: "babel-loader",
+					options: {
+						presets: [
+							"@babel/preset-env",
+							"@babel/preset-react"
+						]
+					}
+				}
+			},
 			{
 				test: /\.(sa|sc|c)ss$/,
 				use: [
