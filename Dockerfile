@@ -8,7 +8,9 @@ COPY ./*.go ./
 
 COPY ./go.* ./
 
-RUN CGO_ENABLED=0 go build -a -ldflags '-s'
+ARG version
+
+RUN CGO_ENABLED=0 go build -a -ldflags "-s -X main.version=$version"
 
 FROM node AS webpack
 
