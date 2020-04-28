@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/dfkdream/gallery-plugin/api"
 
@@ -16,6 +17,9 @@ import (
 
 var (
 	version = ""
+	appHtml = []byte(`<link rel="stylesheet" href="/api/gallery/assets/admin.bundle.css"/>` + "\n" +
+		`<div id="app"></div>` + "\n" +
+		`<script src="/api/gallery/assets/admin.bundle.js"></script>`)
 )
 
 func main() {
@@ -30,6 +34,30 @@ func main() {
 	cfg := config.Get()
 
 	fmt.Println(cfg)
+
+	p.HandleAdminPage("/", "Manage gallery", http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		_, err := res.Write(appHtml)
+		if err != nil {
+			log.Println(err)
+			http.Error(res, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}))
+
+	p.AdminPageRouter().PathPrefix("/").HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		_, err := res.Write(appHtml)
+		if err != nil {
+			log.Println(err)
+			http.Error(res, "Internal Server Error", http.StatusInternalServerError)
+		}
+	})
+
+	p.APIRouter().PathPrefix("/assets/").HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		if strings.HasSuffix(req.URL.Path, "/") {
+			http.NotFound(res, req)
+			return
+		}
+		http.StripPrefix("/api/assets", http.FileServer(http.Dir("./assets"))).ServeHTTP(res, req)
+	})
 
 	b, err := bolt.Open(cfg.BoltPath, os.FileMode(0644), nil)
 	if err != nil {
