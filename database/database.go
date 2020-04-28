@@ -2,11 +2,13 @@ package database
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"image"
+	_ "image/gif"
 	"image/jpeg"
+	_ "image/png"
 	"io"
-	"strconv"
 
 	"github.com/boltdb/bolt"
 	"github.com/dfkdream/gallery-plugin/config"
@@ -48,7 +50,13 @@ func New(db *bolt.DB, cfg *config.Config) (*Database, error) {
 }
 
 func idToBytes(id uint64) []byte {
-	return []byte(strconv.FormatUint(id, 10))
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, id)
+	return b
+}
+
+func btoi(v []byte) uint64 {
+	return binary.BigEndian.Uint64(v)
 }
 
 type Gallery struct {
@@ -62,12 +70,8 @@ func (d *Database) GetGalleries() ([]Gallery, error) {
 		b := tx.Bucket(galleryBucket)
 		c := b.Cursor()
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
-			id, err := strconv.Atoi(string(k))
-			if err != nil {
-				return err
-			}
 			result = append(result, Gallery{
-				Id:    uint64(id),
+				Id:    btoi(k),
 				Title: string(b.Bucket(k).Get(titleKey)),
 			})
 		}
@@ -161,24 +165,17 @@ func (d *Database) GetAlbums(galleryId uint64) ([]Album, error) {
 		b = b.Bucket(albumsBucket)
 		c := b.Cursor()
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
-			id, err := strconv.Atoi(string(k))
-			if err != nil {
-				return err
-			}
 			title := string(b.Bucket(k).Get(titleKey))
 
-			cover := 0
+			var cover uint64 = 0
 			key, _ := b.Bucket(k).Bucket(imagesBucket).Cursor().First()
 			if key != nil {
-				cover, err = strconv.Atoi(string(key))
-				if err != nil {
-					return err
-				}
+				cover = btoi(key)
 			}
 			result = append(result, Album{
-				Id:    uint64(id),
+				Id:    btoi(k),
 				Title: title,
-				Cover: uint64(cover),
+				Cover: cover,
 			})
 		}
 		return nil
@@ -202,15 +199,11 @@ func (d *Database) GetAlbum(galleryId, albumId uint64) (Album, error) {
 		}
 		result.Id = albumId
 		result.Title = string(b.Get(titleKey))
-		cover := 0
+		var cover uint64 = 0
 		if k, _ := b.Bucket(imagesBucket).Cursor().First(); k != nil {
-			var err error
-			cover, err = strconv.Atoi(string(k))
-			if err != nil {
-				return err
-			}
+			cover = btoi(k)
 		}
-		result.Cover = uint64(cover)
+		result.Cover = cover
 		return nil
 	})
 
@@ -298,14 +291,11 @@ func (d *Database) GetImages(galleryId, albumId uint64) ([]Image, error) {
 
 		c := b.Cursor()
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
-			id, err := strconv.Atoi(string(k))
-			if err != nil {
-				return err
-			}
+			id := btoi(k)
 			description := string(b.Bucket(k).Get(descriptionKey))
 
 			result = append(result, Image{
-				Id:          uint64(id),
+				Id:          id,
 				Description: description,
 			})
 		}
