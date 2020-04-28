@@ -323,7 +323,7 @@ func (d *Database) AddImage(galleryId, albumId uint64, imageReader io.Reader) (u
 		return 0, err
 	}
 
-	thumb := resize.Thumbnail(1280, 720, img, d.cfg.Interpolation)
+	thumb := resize.Thumbnail(640, 360, img, d.cfg.Interpolation)
 
 	var tBuff, iBuff bytes.Buffer
 	err = jpeg.Encode(&tBuff, thumb, &jpeg.Options{Quality: d.cfg.Quality})
