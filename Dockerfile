@@ -4,6 +4,12 @@ RUN apk update && apk upgrade
 
 WORKDIR /gallery
 
+COPY ./api ./api
+
+COPY ./config ./config
+
+COPY ./database ./database
+
 COPY ./*.go ./
 
 COPY ./go.* ./
@@ -33,7 +39,5 @@ WORKDIR /app
 COPY --from=build /gallery/gallery-plugin ./gallery-plugin
 
 COPY --from=webpack /webpack/dist ./assets/
-
-COPY ./html ./html/
 
 ENTRYPOINT ["./gallery-plugin"]
