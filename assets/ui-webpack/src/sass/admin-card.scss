@@ -1,0 +1,32 @@
+.card {
+  border: 0;
+  box-shadow: 0 .25rem 1rem rgba(48, 55, 66, .15);
+  height: 100%;
+}
+
+.card-container {
+  margin: .5em 0;
+}
+
+.image-placeholder {
+  background-color: #EEE;
+  color: #AAA;
+  padding-top: calc(50% - .75em);
+  padding-bottom: calc(50% - .75em);
+  text-align: center;
+
+  &::after{
+    content: "No Image";
+  }
+}
+
+.card-image.img{
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50% 50%;
+  padding-bottom: 100%;
+
+  &:hover{
+    background-size: contain;
+  }
+}

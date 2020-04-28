@@ -1,0 +1,15 @@
+.location-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding-bottom: .4rem;
+
+    h1{
+        margin: 0;
+    }
+
+    i{
+        margin-right: 5px;
+    }
+}
