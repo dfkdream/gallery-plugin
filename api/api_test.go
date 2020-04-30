@@ -200,8 +200,8 @@ func TestAPI_SetupHandlers(t *testing.T) {
 						t.Error(idx, idx2, err)
 						return
 					}
-					if i.Bounds() != image.Rect(0, 0, 720, 720) {
-						t.Error(idx, idx2, "image size not matches:", i.Bounds(), "!=", image.Rect(0, 0, 720, 720))
+					if i.Bounds() != image.Rect(0, 0, 360, 360) {
+						t.Error(idx, idx2, "image size not matches:", i.Bounds(), "!=", image.Rect(0, 0, 360, 360))
 					}
 				},
 			}, {

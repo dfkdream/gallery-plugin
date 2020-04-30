@@ -357,8 +357,8 @@ func TestDatabase_GetThumbnail(t *testing.T) {
 		t.Errorf("%s != jpeg", it)
 	}
 
-	if ig.Bounds() != image.Rect(0, 0, 720, 720) {
-		t.Errorf("%+v != %+v", ig.Bounds(), image.Rect(0, 0, 720, 720))
+	if ig.Bounds() != image.Rect(0, 0, 360, 360) {
+		t.Errorf("%+v != %+v", ig.Bounds(), image.Rect(0, 0, 360, 360))
 	}
 }
 
