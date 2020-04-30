@@ -9,7 +9,7 @@ function AlbumCard(props){
                 <figure className="image is-1by1 img"
                         style={{backgroundImage: `url(/api/gallery/${props.gallery.id}/album/${props.album.id}/image/${props.album.cover}?thumb=1)`}}
                 />:
-                <figure className="image is-1by1 placeholder"/>
+                <figure className="image placeholder"/>
             }
             <h3>{props.album.title}</h3>
         </a>
