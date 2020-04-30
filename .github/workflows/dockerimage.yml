@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Fetch latest release version
+        run: |
+          git fetch --depth=1 origin "+refs/tags/*:refs/tags/*"
+          echo "::set-env name=LATEST_VERSION::$(git tag | tail -1)"
+          echo "::set-env name=SHA8::$(git rev-parse --short=8 $GITHUB_SHA)"
+
+      - name: Build the Docker image
+        run: docker build --tag "gallery-plugin:$LATEST_VERSION.$SHA8" --tag gallery-plugin:latest .
+
+      - name: Upload image to Docker Hub
+        run: |
+          echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u dfkdream --password-stdin
+          docker tag "hugocms:$LATEST_VERSION.$SHA8" "dfkdream/gallery-plugin:$LATEST_VERSION.$SHA8"
+          docker tag "hugocms:$LATEST_VERSION.$SHA8" "dfkdream/gallery-plugin"
+          docker push "dfkdream/hugocms"
