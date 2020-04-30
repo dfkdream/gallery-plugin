@@ -24,6 +24,6 @@ jobs:
       - name: Upload image to Docker Hub
         run: |
           echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u dfkdream --password-stdin
-          docker tag "hugocms:$LATEST_VERSION.$SHA8" "dfkdream/gallery-plugin:$LATEST_VERSION.$SHA8"
-          docker tag "hugocms:$LATEST_VERSION.$SHA8" "dfkdream/gallery-plugin"
-          docker push "dfkdream/hugocms"
+          docker tag "gallery-plugin:$LATEST_VERSION.$SHA8" "dfkdream/gallery-plugin:$LATEST_VERSION.$SHA8"
+          docker tag "gallery-plugin:$LATEST_VERSION.$SHA8" "dfkdream/gallery-plugin"
+          docker push "dfkdream/gallery-plugin"
