@@ -3,6 +3,7 @@ import AlbumsEmpty from "../components/albumsEmpty";
 
 import "../../../sass/admin-location-header.scss";
 import AlbumCard from "../components/albumCard";
+import CopyButton from "../components/copyButton";
 
 const popups = require('../popup');
 
@@ -12,6 +13,8 @@ class AlbumsHeader extends Component {
             <div className="location-header">
                 <h1>{this.props.gallery.title}</h1>
                 <div>
+                    <CopyButton text={`{{< gallery "${this.props.gallery.id}" >}}`} caption={"Copy Shortcode"}
+                                timeout={1000}/>
                     <button className="btn btn-primary" onClick={this.props.onClick}>
                         <i className="fa fa-plus"/>
                         Add Album
