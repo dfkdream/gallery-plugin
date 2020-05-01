@@ -1,8 +1,11 @@
 .gallery {
   @import "~bulma/sass/utilities/_all.sass";
+  @import "~bulma/sass/base/_all.sass";
   @import "~bulma/sass/grid/columns.sass";
   @import "~bulma/sass/elements/image.sass";
   @import "~bulma/sass/components/breadcrumb.sass";
+
+  box-sizing: border-box;
 
   figure[data-description] {
 
