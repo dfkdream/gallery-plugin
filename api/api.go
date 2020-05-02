@@ -1,10 +1,13 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/dfkdream/gallery-plugin/database"
 
@@ -316,11 +319,12 @@ func (a *API) imageHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	var img []byte = nil
+	var modTime time.Time
 
 	if req.URL.Query().Get("thumb") != "" {
-		img, err = a.db.GetThumbnail(gid, aid, iid)
+		img, modTime, err = a.db.GetThumbnail(gid, aid, iid)
 	} else {
-		img, err = a.db.GetImage(gid, aid, iid)
+		img, modTime, err = a.db.GetImage(gid, aid, iid)
 	}
 
 	if err != nil {
@@ -337,7 +341,7 @@ func (a *API) imageHandler(res http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		res.Header().Set("Content-Type", "image/jpeg")
-		_, _ = res.Write(img)
+		http.ServeContent(res, req, fmt.Sprintf("%d_%d_%d.jpg", gid, aid, iid), modTime, bytes.NewReader(img))
 	case "POST":
 		var values struct {
 			Description string `json:"description"`
