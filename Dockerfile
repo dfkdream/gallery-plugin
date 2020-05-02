@@ -30,7 +30,9 @@ RUN npm install
 
 COPY ./assets/ui-webpack/ .
 
-RUN npx webpack --mode production
+ARG mode
+
+RUN npx webpack --mode $mode
 
 FROM scratch
 
