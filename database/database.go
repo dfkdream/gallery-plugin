@@ -29,7 +29,7 @@ var (
 	imagesBucket   = []byte("images")
 	imageKey       = []byte("image")
 	thumbnailKey   = []byte("thumbnail")
-	uploadTimeKey  = []byte("uploadTime")
+	timestampKey   = []byte("timestamp")
 	descriptionKey = []byte("description")
 )
 
@@ -368,7 +368,7 @@ func (d *Database) AddImage(galleryId, albumId uint64, imageReader io.Reader) (u
 			return err
 		}
 
-		return imgBucket.Put(uploadTimeKey, itob(uint64(time.Now().UnixNano())))
+		return imgBucket.Put(timestampKey, itob(uint64(time.Now().UnixNano())))
 	})
 
 	return imgId, err
@@ -414,7 +414,7 @@ func (d *Database) DeleteImage(galleryId, albumId, imageId uint64) error {
 
 func (d *Database) GetImage(galleryId, albumId, imageId uint64) ([]byte, time.Time, error) {
 	var img []byte = nil
-	var modTime time.Time
+	timestamp := time.Unix(1, 0)
 
 	err := d.db.View(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
@@ -437,19 +437,21 @@ func (d *Database) GetImage(galleryId, albumId, imageId uint64) ([]byte, time.Ti
 		img = make([]byte, len(ib))
 		copy(img, ib)
 
-		modTime = time.Unix(0, int64(btoi(i.Get(uploadTimeKey))))
+		if mt := i.Get(timestampKey); mt != nil {
+			timestamp = time.Unix(0, int64(btoi(mt)))
+		}
 
 		return nil
 	})
 	if err != nil {
-		return nil, modTime, err
+		return nil, timestamp, err
 	}
-	return img, modTime, nil
+	return img, timestamp, nil
 }
 
 func (d *Database) GetThumbnail(galleryId, albumId, imageId uint64) ([]byte, time.Time, error) {
 	var img []byte = nil
-	var modTime time.Time
+	timestamp := time.Unix(1, 0)
 	err := d.db.View(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
 		b := g.Bucket(itob(galleryId))
@@ -470,12 +472,14 @@ func (d *Database) GetThumbnail(galleryId, albumId, imageId uint64) ([]byte, tim
 		img = make([]byte, len(ib))
 		copy(img, ib)
 
-		modTime = time.Unix(0, int64(btoi(i.Get(uploadTimeKey))))
+		if mt := i.Get(timestampKey); mt != nil {
+			timestamp = time.Unix(0, int64(btoi(mt)))
+		}
 
 		return nil
 	})
 	if err != nil {
-		return nil, modTime, err
+		return nil, timestamp, err
 	}
-	return img, modTime, nil
+	return img, timestamp, nil
 }
