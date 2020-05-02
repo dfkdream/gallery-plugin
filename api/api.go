@@ -319,12 +319,12 @@ func (a *API) imageHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	var img []byte = nil
-	var modTime time.Time
+	var timestamp time.Time
 
 	if req.URL.Query().Get("thumb") != "" {
-		img, modTime, err = a.db.GetThumbnail(gid, aid, iid)
+		img, timestamp, err = a.db.GetThumbnail(gid, aid, iid)
 	} else {
-		img, modTime, err = a.db.GetImage(gid, aid, iid)
+		img, timestamp, err = a.db.GetImage(gid, aid, iid)
 	}
 
 	if err != nil {
@@ -340,8 +340,9 @@ func (a *API) imageHandler(res http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case "GET":
+		filename := fmt.Sprintf("%d_%d_%d.jpg", gid, aid, iid)
 		res.Header().Set("Content-Type", "image/jpeg")
-		http.ServeContent(res, req, fmt.Sprintf("%d_%d_%d.jpg", gid, aid, iid), modTime, bytes.NewReader(img))
+		http.ServeContent(res, req, filename, timestamp, bytes.NewReader(img))
 	case "POST":
 		var values struct {
 			Description string `json:"description"`
