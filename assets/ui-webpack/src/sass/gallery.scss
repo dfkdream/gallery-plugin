@@ -5,6 +5,9 @@
   @import "~bulma/sass/elements/image.sass";
   @import "~bulma/sass/components/breadcrumb.sass";
 
+  $title-color: inherit;
+  @import "~bulma/sass/elements/title.sass";
+
   box-sizing: border-box;
 
   figure[data-description] {
@@ -57,8 +60,8 @@
     display: block;
     text-align: center;
 
-    h3 {
-      margin: .5em !important;
+    h5 {
+      margin: .5em;
     }
   }
 

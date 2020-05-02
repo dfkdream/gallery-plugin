@@ -11,7 +11,7 @@ function AlbumCard(props){
                 />:
                 <figure className="image placeholder"/>
             }
-            <h3>{props.album.title}</h3>
+            <h5 className="title is-5">{props.album.title}</h5>
         </a>
     )
 }
