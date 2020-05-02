@@ -9,6 +9,7 @@ import (
 	"path"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/dfkdream/gallery-plugin/config"
 	"github.com/nfnt/resize"
@@ -311,7 +312,8 @@ func TestDatabase_GetImage(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	i, err := db.GetImage(gid, aid, iid)
+	ut := time.Now().Add(-100 * time.Millisecond)
+	i, mt, err := db.GetImage(gid, aid, iid)
 	if err != nil {
 		t.Error(err)
 	}
@@ -327,6 +329,10 @@ func TestDatabase_GetImage(t *testing.T) {
 	if ig.Bounds() != image.Rect(0, 0, 1280, 1280) {
 		t.Errorf("%+v != %+v", ig.Bounds(), image.Rect(0, 0, 1280, 1280))
 	}
+
+	if ut.After(mt) {
+		t.Error("Upload time error")
+	}
 }
 
 func TestDatabase_GetThumbnail(t *testing.T) {
@@ -340,11 +346,12 @@ func TestDatabase_GetThumbnail(t *testing.T) {
 		t.Error(err)
 	}
 	img := createTestImage()
+	ut := time.Now().Add(-100 * time.Millisecond)
 	iid, err := db.AddImage(gid, aid, &img)
 	if err != nil {
 		t.Error(err)
 	}
-	i, err := db.GetThumbnail(gid, aid, iid)
+	i, mt, err := db.GetThumbnail(gid, aid, iid)
 	if err != nil {
 		t.Error(err)
 	}
@@ -359,6 +366,10 @@ func TestDatabase_GetThumbnail(t *testing.T) {
 
 	if ig.Bounds() != image.Rect(0, 0, 360, 360) {
 		t.Errorf("%+v != %+v", ig.Bounds(), image.Rect(0, 0, 360, 360))
+	}
+
+	if ut.After(mt) {
+		t.Error("Upload time error")
 	}
 }
 

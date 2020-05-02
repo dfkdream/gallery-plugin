@@ -9,6 +9,7 @@ import (
 	"image/jpeg"
 	_ "image/png"
 	"io"
+	"time"
 
 	"github.com/boltdb/bolt"
 	"github.com/dfkdream/gallery-plugin/config"
@@ -28,6 +29,7 @@ var (
 	imagesBucket   = []byte("images")
 	imageKey       = []byte("image")
 	thumbnailKey   = []byte("thumbnail")
+	uploadTimeKey  = []byte("uploadTime")
 	descriptionKey = []byte("description")
 )
 
@@ -410,8 +412,10 @@ func (d *Database) DeleteImage(galleryId, albumId, imageId uint64) error {
 	})
 }
 
-func (d *Database) GetImage(galleryId, albumId, imageId uint64) ([]byte, error) {
+func (d *Database) GetImage(galleryId, albumId, imageId uint64) ([]byte, time.Time, error) {
 	var img []byte = nil
+	var modTime time.Time
+
 	err := d.db.View(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
 		b := g.Bucket(itob(galleryId))
@@ -432,16 +436,20 @@ func (d *Database) GetImage(galleryId, albumId, imageId uint64) ([]byte, error) 
 		ib := i.Get(imageKey)
 		img = make([]byte, len(ib))
 		copy(img, ib)
+
+		modTime = time.Unix(0, int64(btoi(i.Get(uploadTimeKey))))
+
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, modTime, err
 	}
-	return img, nil
+	return img, modTime, nil
 }
 
-func (d *Database) GetThumbnail(galleryId, albumId, imageId uint64) ([]byte, error) {
+func (d *Database) GetThumbnail(galleryId, albumId, imageId uint64) ([]byte, time.Time, error) {
 	var img []byte = nil
+	var modTime time.Time
 	err := d.db.View(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
 		b := g.Bucket(itob(galleryId))
@@ -461,10 +469,13 @@ func (d *Database) GetThumbnail(galleryId, albumId, imageId uint64) ([]byte, err
 		ib := i.Get(thumbnailKey)
 		img = make([]byte, len(ib))
 		copy(img, ib)
+
+		modTime = time.Unix(0, int64(btoi(i.Get(uploadTimeKey))))
+
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, modTime, err
 	}
-	return img, nil
+	return img, modTime, nil
 }
