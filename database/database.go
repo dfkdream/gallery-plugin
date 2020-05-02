@@ -49,7 +49,7 @@ func New(db *bolt.DB, cfg *config.Config) (*Database, error) {
 	return &Database{db: db, cfg: cfg}, nil
 }
 
-func idToBytes(id uint64) []byte {
+func itob(id uint64) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, id)
 	return b
@@ -87,7 +87,7 @@ func (d *Database) GetGallery(galleryId uint64) (Gallery, error) {
 	var result Gallery
 	err := d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(galleryBucket)
-		b = b.Bucket(idToBytes(galleryId))
+		b = b.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
@@ -112,7 +112,7 @@ func (d *Database) CreateGallery(title string) (uint64, error) {
 		if err != nil {
 			return err
 		}
-		bkt, err := b.CreateBucket(idToBytes(id))
+		bkt, err := b.CreateBucket(itob(id))
 		if err != nil {
 			return err
 		}
@@ -131,14 +131,14 @@ func (d *Database) CreateGallery(title string) (uint64, error) {
 // DeleteGallery deletes gallery
 func (d *Database) DeleteGallery(id uint64) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
-		return tx.Bucket(galleryBucket).DeleteBucket(idToBytes(id))
+		return tx.Bucket(galleryBucket).DeleteBucket(itob(id))
 	})
 }
 
 func (d *Database) SetGalleryTitle(id uint64, title string) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(id))
+		b := g.Bucket(itob(id))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
@@ -158,7 +158,7 @@ func (d *Database) GetAlbums(galleryId uint64) ([]Album, error) {
 
 	err := d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(galleryBucket)
-		b = b.Bucket(idToBytes(galleryId))
+		b = b.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
@@ -188,12 +188,12 @@ func (d *Database) GetAlbum(galleryId, albumId uint64) (Album, error) {
 	var result Album
 	err := d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(galleryBucket)
-		b = b.Bucket(idToBytes(galleryId))
+		b = b.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
@@ -215,7 +215,7 @@ func (d *Database) CreateAlbum(galleryId uint64, title string) (uint64, error) {
 
 	err := d.db.Update(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(galleryId))
+		b := g.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
@@ -225,7 +225,7 @@ func (d *Database) CreateAlbum(galleryId uint64, title string) (uint64, error) {
 		if err != nil {
 			return err
 		}
-		a, err := b.CreateBucket(idToBytes(albumId))
+		a, err := b.CreateBucket(itob(albumId))
 		if err != nil {
 			return err
 		}
@@ -243,12 +243,12 @@ func (d *Database) CreateAlbum(galleryId uint64, title string) (uint64, error) {
 func (d *Database) SetAlbumTitle(galleryId, albumId uint64, title string) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(galleryId))
+		b := g.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
@@ -259,12 +259,12 @@ func (d *Database) SetAlbumTitle(galleryId, albumId uint64, title string) error 
 func (d *Database) DeleteAlbum(galleryId, albumId uint64) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(galleryBucket)
-		b = b.Bucket(idToBytes(galleryId))
+		b = b.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		return b.DeleteBucket(idToBytes(albumId))
+		return b.DeleteBucket(itob(albumId))
 	})
 }
 
@@ -278,12 +278,12 @@ func (d *Database) GetImages(galleryId, albumId uint64) ([]Image, error) {
 
 	err := d.db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket(galleryBucket)
-		b = b.Bucket(idToBytes(galleryId))
+		b = b.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
@@ -328,13 +328,13 @@ func (d *Database) AddImage(galleryId, albumId uint64, imageReader io.Reader) (u
 
 	err = d.db.Update(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(galleryId))
+		b := g.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
 
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
@@ -346,7 +346,7 @@ func (d *Database) AddImage(galleryId, albumId uint64, imageReader io.Reader) (u
 			return err
 		}
 
-		imgBucket, err := imgs.CreateBucket(idToBytes(imgId))
+		imgBucket, err := imgs.CreateBucket(itob(imgId))
 		if err != nil {
 			return err
 		}
@@ -361,7 +361,12 @@ func (d *Database) AddImage(galleryId, albumId uint64, imageReader io.Reader) (u
 			return err
 		}
 
-		return imgBucket.Put(descriptionKey, []byte(""))
+		err = imgBucket.Put(descriptionKey, []byte(""))
+		if err != nil {
+			return err
+		}
+
+		return imgBucket.Put(uploadTimeKey, itob(uint64(time.Now().UnixNano())))
 	})
 
 	return imgId, err
@@ -370,17 +375,17 @@ func (d *Database) AddImage(galleryId, albumId uint64, imageReader io.Reader) (u
 func (d *Database) SetImageDescription(galleryId, albumId, imageId uint64, description string) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(galleryId))
+		b := g.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
 		b = b.Bucket(imagesBucket)
-		i := b.Bucket(idToBytes(imageId))
+		i := b.Bucket(itob(imageId))
 		if i == nil {
 			return ErrImageNotFound
 		}
@@ -391,17 +396,17 @@ func (d *Database) SetImageDescription(galleryId, albumId, imageId uint64, descr
 func (d *Database) DeleteImage(galleryId, albumId, imageId uint64) error {
 	return d.db.Update(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(galleryId))
+		b := g.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
 		b = b.Bucket(imagesBucket)
-		return b.DeleteBucket(idToBytes(imageId))
+		return b.DeleteBucket(itob(imageId))
 	})
 }
 
@@ -409,17 +414,17 @@ func (d *Database) GetImage(galleryId, albumId, imageId uint64) ([]byte, error) 
 	var img []byte = nil
 	err := d.db.View(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(galleryId))
+		b := g.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
 		b = b.Bucket(imagesBucket)
-		i := b.Bucket(idToBytes(imageId))
+		i := b.Bucket(itob(imageId))
 		if i == nil {
 			return ErrImageNotFound
 		}
@@ -439,17 +444,17 @@ func (d *Database) GetThumbnail(galleryId, albumId, imageId uint64) ([]byte, err
 	var img []byte = nil
 	err := d.db.View(func(tx *bolt.Tx) error {
 		g := tx.Bucket(galleryBucket)
-		b := g.Bucket(idToBytes(galleryId))
+		b := g.Bucket(itob(galleryId))
 		if b == nil {
 			return ErrGalleryNotFound
 		}
 		b = b.Bucket(albumsBucket)
-		b = b.Bucket(idToBytes(albumId))
+		b = b.Bucket(itob(albumId))
 		if b == nil {
 			return ErrAlbumNotFound
 		}
 		b = b.Bucket(imagesBucket)
-		i := b.Bucket(idToBytes(imageId))
+		i := b.Bucket(itob(imageId))
 		if i == nil {
 			return ErrImageNotFound
 		}
