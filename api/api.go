@@ -9,7 +9,6 @@ import (
 	"github.com/dfkdream/gallery-plugin/database"
 
 	"github.com/dfkdream/hugocms/plugin"
-	"github.com/dfkdream/hugocms/user"
 	"github.com/gorilla/mux"
 )
 
@@ -374,7 +373,7 @@ func (a *API) SetupHandlers(r *mux.Router) {
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			if req.Method != "GET" {
-				if _, ok := req.Context().Value(plugin.ContextKeyUser).(*user.User); !ok {
+				if plugin.GetUser(req) == nil {
 					http.Error(res, "Forbidden", http.StatusForbidden)
 					return
 				}
