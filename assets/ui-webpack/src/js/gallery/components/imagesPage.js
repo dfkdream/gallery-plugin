@@ -1,31 +1,35 @@
-import React from "react"
-
-import "../../../sass/gallery.scss";
+import React, {Component} from "react"
 
 import ImageCard from "./imageCard";
 
-function ImagesPage(props) {
-    return (
-        <div>
-            <nav className="breadcrumb is-large">
-                <ul>
-                    <li>
-                        <a href="#!/" onClick={()=>{props.loadAlbums();}}>{props.gallery.title}</a>
-                    </li>
-                    <li className="is-active"><a>{props.album.title}</a></li>
-                </ul>
-            </nav>
-            <div className="columns is-multiline">
-                {props.images.map(i => {
-                    return (
-                        <div className="column is-one-third">
-                            <ImageCard gallery={props.gallery} album={props.album} image={i}/>
-                        </div>
-                    );
-                })}
+import "../../../sass/gallery.scss";
+
+class ImagesPage extends Component {
+    render() {
+        return (
+            <div>
+                <nav className="breadcrumb is-large">
+                    <ul>
+                        <li key={"g-"+this.props.gallery.id}>
+                            <a href="#!/" onClick={() => {
+                                this.props.loadAlbums();
+                            }}>{this.props.gallery.title}</a>
+                        </li>
+                        <li className="is-active" key={"a-"+this.props.album.id}><a>{this.props.album.title}</a></li>
+                    </ul>
+                </nav>
+                <div className="columns is-multiline">
+                    {this.props.images.map((i, idx) => {
+                        return (
+                            <div className="column is-one-third" key={"i-"+i.id}>
+                                <ImageCard gallery={this.props.gallery} album={this.props.album} images={this.props.images} index={idx}/>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-        </div>
-    )
+        );
+    }
 }
 
 export default ImagesPage;
